@@ -1,0 +1,1 @@
+it looks weird.. is there a way that determine the spin lenght based on the number selected. So if the number selected is number 1, the carrousel spins twice. if the number selected is number 2, the carrousel spins twice + one extra 1/6 of the turn. if the number is 3, twice + 2/3 extra, and so on.
