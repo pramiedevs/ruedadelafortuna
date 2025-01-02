@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Carousel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #fff;
+    }
+
+    .carousel {
+      width: 100%;
+      height: 400px;
+      perspective: 1000px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .carousel-container {
+      width: 60%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+    }
+
+    .carousel-item {
+      width: 150px;
+      height: 200px;
+      position: absolute;
+      transform-origin: center;
+      background-color: #f0f0f0;
+      border: 2px solid #ccc;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      line-height: 200px;
+      font-size: 18px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="carousel">
+    <div class="carousel-container" id="carouselContainer">
+      <!-- Carousel items will be dynamically injected here -->
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById('carouselContainer');
+
+    const items = [
+      'Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6'
+    ];
+
+    // Configuration values for carousel
+    const config = {
+      xRadius: 600, // Distance from center on X-axis
+      yRadius: 0,   // Distance from center on Y-axis
+      xRotation: 0  // Rotation angle of the carousel
+    };
+
+    // Initialize carousel items
+    function createCarousel() {
+      const itemCount = items.length;
+      const angleStep = 360 / itemCount;
+
+      items.forEach((item, index) => {
+        const angle = angleStep * index;
+        const element = document.createElement('div');
+        element.className = 'carousel-item';
+        element.id = `item-${index + 1}`; // Assign an ID based on position
+        element.style.transform = `rotateY(${angle}deg) translateZ(${config.xRadius}px)`;
+        element.innerText = item;
+        container.appendChild(element);
+      });
+    }
+
+    // Ensure carousel always starts with Item 1 at the front
+    function positionCarousel() {
+      const itemCount = items.length;
+      const angleStep = 360 / itemCount;
+      const elements = document.querySelectorAll('.carousel-item');
+
+      elements.forEach((element, index) => {
+        const angle = angleStep * index;
+        element.style.transform = `rotateY(${angle}deg) translateZ(${config.xRadius}px)`;
+      });
+    }
+
+    // Initialize
+    createCarousel();
+    positionCarousel();
+  </script>
+</body>
+</html>
