@@ -11,12 +11,12 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background-color: #fff;
+      background-color: #000000;
     }
 
     .carousel {
       width: 100%;
-      height: 400px;
+      height: 500px;
       perspective: 1000px;
       display: flex;
       justify-content: center;
@@ -37,8 +37,8 @@
     }
 
     .carousel-item {
-      width: 150px;
-      height: 200px;
+      width: 200px;
+      height: 250px;
       position: absolute;
       top: 50%;
       left: 50%;
@@ -115,6 +115,7 @@
     const spinButton = document.getElementById('spinButton');
     const winnerElement = document.getElementById('winner');
 
+
     // Array of items with both text and color properties
     const items = [
       { name: 'Item 1', color: '#FF5733', chance: 0.3 },  // 0.3% chance
@@ -181,6 +182,8 @@
       let cumulativeChance = 0;
       let selectedItem = items[0];
 
+      document.body.style.backgroundColor = "whitesmoke";
+
       for (const item of items) {
         cumulativeChance += item.chance;
         if (randomChance <= cumulativeChance) {
@@ -194,8 +197,8 @@
 
       // Show the colored card in the center
       const winnerCard = document.createElement('div');
-      winnerCard.style.width = '200px';
-      winnerCard.style.height = '300px';
+      winnerCard.style.width = '300px';
+      winnerCard.style.height = '400px';
       winnerCard.style.backgroundColor = selectedItem.color;
       winnerCard.style.border = '2px solid #ccc';
       winnerCard.style.position = 'absolute';
