@@ -55,7 +55,7 @@
 
     .spin-button {
       position: absolute;
-      bottom: 20px;
+      bottom: -90px;
       padding: 10px 20px;
       background-color: #007BFF;
       color: #fff;
@@ -64,6 +64,11 @@
       font-size: 16px;
       cursor: pointer;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+    .logo {
+      position: absolute;
+      z-index: -1;
+      width: 50%;
     }
 
     .spin-button:hover {
@@ -102,9 +107,9 @@
       <!-- Carousel items will be dynamically injected here -->
     </div>
     <button class="spin-button" id="spinButton">Spin</button>
+    <img class="logo" src="/colibri-removebg-preview.png"></img>
     <div class="winner" id="winner"></div>
   </div>
-
   <script>
     const container = document.getElementById('carouselContainer');
     const spinButton = document.getElementById('spinButton');
@@ -112,23 +117,16 @@
 
     // Array of items with both text and color properties
     const items = [
-      { name: 'Item 1', color: '#FF5733' },  // Red
-      { name: 'Item 2', color: '#33FF57' },  // Green
-      { name: 'Item 3', color: '#3357FF' },  // Blue
-      { name: 'Item 4', color: '#FF33A1' },  // Pink
-      { name: 'Item 5', color: '#FF8C33' },  // Orange
-      { name: 'Item 6', color: '#33FFF5' }   // Cyan
+      { name: 'Item 1', color: '#FF5733', chance: 0.3 },  // 0.3% chance
+      { name: 'Item 2', color: '#33FF57', chance: 1.7 },  // 1.7% chance
+      { name: 'Item 3', color: '#3357FF', chance: 3 },  // 3% chance
+      { name: 'Item 4', color: '#FF33A1', chance: 5 },  // 5% chance
+      { name: 'Item 5', color: '#FF8C33', chance: 10 }, // 10% chance
+      { name: 'Item 6', color: '#33FFF5', chance: 15 }, // 15% chance
+      { name: 'Item 7', color: '#A833FF', chance: 25 }, // 25% chance
+      { name: 'Item 8', color: '#FFC233', chance: 40 }  // 40% chance
     ];
 
-    // Configuration values for carousel
-    const config = {
-      xRadius: 400, // Distance from center on X-axis
-      yRadius: 0,   // Distance from center on Y-axis
-      xRotation: 0, // Rotation angle of the carousel
-      animationDuration: 3000 // Duration of spin animation in ms
-    };
-
-    let currentAngle = 0;
     let isSpinning = false;
 
     // Initialize carousel items
@@ -141,11 +139,14 @@
         const element = document.createElement('div');
         element.className = 'carousel-item';
         element.id = `item-${index + 1}`; // Assign an ID based on position
-        element.style.transform = `rotateY(${angle}deg) translateZ(${config.xRadius}px) translate(-50%, -50%)`;
+        element.style.transform = `rotateY(${angle}deg) translateZ(400px) translate(-50%, -50%)`;
         element.style.backgroundColor = item.color; // Apply the color from the array
         element.innerText = item.name;
         container.appendChild(element);
       });
+
+      // Start slow default spin
+      container.style.animation = 'slowSpin 20s linear infinite';
     }
 
     // Spin carousel to reveal winner
@@ -153,71 +154,62 @@
       if (isSpinning) return; // Prevent multiple spins at the same time
       isSpinning = true;
 
-      // Randomly select an item index
-      const randomIndex = Math.floor(Math.random() * items.length);
+      // Temporarily increase spin speed
+      container.style.animation = 'fastSpin 2s linear infinite';
 
-      // Calculate the target angle to bring the selected item to the front
-      const targetAngle = -randomIndex * (360 / items.length);
-
-      // Add extra spins for animation effect
-      const baseSpins = 2; // Base number of full spins
-      const extraFraction = randomIndex / items.length; // Fractional part based on selected item
-      const totalRotation = baseSpins + extraFraction;
-
-      // Final rotation angle
-      const finalAngle = currentAngle + totalRotation * 360 + targetAngle;
-
-      // Start the spin
-      container.style.transition = 'transform 3s ease-out'; // Spin duration
-      container.style.transform = `rotateY(${finalAngle}deg)`;
-
+      // Fade out carousel before revealing winner
       setTimeout(() => {
-        container.style.opacity = 0; // Fading out the carousel at the end
-        winnerElement.textContent = items[randomIndex].name; // Set the winner's name
-        winnerElement.style.opacity = 1; // Reveal the winner
+        container.style.animation = 'none'; // Stop the animation
+        container.style.transition = 'opacity 0.5s ease-out';
+        container.style.opacity = 0; // Fade out carousel
 
-        // Show the colored card in the center
-        const winnerCard = document.createElement('div');
-        winnerCard.style.width = '200px';
-        winnerCard.style.height = '300px';
-        winnerCard.style.backgroundColor = items[randomIndex].color;
-        winnerCard.style.border = '2px solid #ccc';
-        winnerCard.style.position = 'absolute';
-        winnerCard.style.top = '50%';
-        winnerCard.style.left = '50%';
-        winnerCard.style.transform = 'translate(-50%, -50%)';
-        winnerCard.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.2)';
-        winnerCard.style.display = 'flex';
-        winnerCard.style.justifyContent = 'center';
-        winnerCard.style.alignItems = 'center';
-        winnerCard.style.color = '#fff';
-        winnerCard.style.fontSize = '20px';
-        winnerCard.innerText = items[randomIndex].name;
-        document.body.appendChild(winnerCard);
+        // Reveal winner after fade out
+        setTimeout(() => {
+          revealWinner();
+        }, 500);
+      }, 2000);
 
-      }, 1000); // Fade out starts after 1 second of fast spinning
-
-      // Reset after a brief delay
+      // Reload the page after 10 seconds
       setTimeout(() => {
-        resetCarousel();
-      }, 10000); // Reset after 10 seconds (winner stays for 10 seconds)
+        location.reload();
+      }, 10000); // Reload after 10 seconds
     }
 
-    // Reset carousel and hide winner
-    function resetCarousel() {
-      container.style.opacity = 1; // Make sure carousel is visible again
-      container.style.transition = 'transform 1s ease'; // Reset rotation
-      container.style.transform = `rotateY(0deg)`; // Reset rotation to the starting position
-      winnerElement.style.opacity = 0; // Hide winner again
+    function revealWinner() {
+      const totalChance = items.reduce((sum, item) => sum + item.chance, 0);
+      const randomChance = Math.random() * totalChance;
+      let cumulativeChance = 0;
+      let selectedItem = items[0];
 
-      // Reset items back to their original positions
-      const elements = document.querySelectorAll('.carousel-item');
-      elements.forEach((element, index) => {
-        const angle = (360 / items.length) * index;
-        element.style.transform = `rotateY(${angle}deg) translateZ(${config.xRadius}px) translate(-50%, -50%)`;
-      });
+      for (const item of items) {
+        cumulativeChance += item.chance;
+        if (randomChance <= cumulativeChance) {
+          selectedItem = item;
+          break;
+        }
+      }
 
-      isSpinning = false;
+      winnerElement.textContent = selectedItem.name; // Set the winner's name
+      winnerElement.style.opacity = 1; // Reveal the winner
+
+      // Show the colored card in the center
+      const winnerCard = document.createElement('div');
+      winnerCard.style.width = '200px';
+      winnerCard.style.height = '300px';
+      winnerCard.style.backgroundColor = selectedItem.color;
+      winnerCard.style.border = '2px solid #ccc';
+      winnerCard.style.position = 'absolute';
+      winnerCard.style.top = '50%';
+      winnerCard.style.left = '50%';
+      winnerCard.style.transform = 'translate(-50%, -50%)';
+      winnerCard.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.2)';
+      winnerCard.style.display = 'flex';
+      winnerCard.style.justifyContent = 'center';
+      winnerCard.style.alignItems = 'center';
+      winnerCard.style.color = '#fff';
+      winnerCard.style.fontSize = '20px';
+      winnerCard.innerText = selectedItem.name;
+      document.body.appendChild(winnerCard);
     }
 
     // Event listener for spin button
@@ -225,7 +217,25 @@
 
     // Initialize carousel and start the soft rotation
     createCarousel();
-    container.classList.add('rotate');
-  </script>
+
+    // Keyframes for animations
+    const styleSheet = document.createElement('style');
+    styleSheet.innerHTML = `
+      @keyframes slowSpin {
+        0% { transform: rotateY(0deg); }
+        100% { transform: rotateY(360deg); }
+      }
+
+      @keyframes fastSpin {
+        0% { transform: rotateY(0deg); }
+        100% { transform: rotateY(360deg); }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+</script>
+
+
+
+
 </body>
 </html>
